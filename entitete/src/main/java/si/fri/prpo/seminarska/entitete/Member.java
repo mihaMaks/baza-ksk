@@ -4,9 +4,7 @@ package si.fri.prpo.seminarska.entitete;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -14,8 +12,8 @@ import java.util.Date;
 @NamedQueries(value =
         {
                 @NamedQuery(name = "Members.getAll", query = "SELECT n FROM Member n"),
-                @NamedQuery(name = "Members.getAllForId",
-                        query = "SELECT n FROM Member n WHERE n.id = :id")
+                @NamedQuery(name = "Members.getAllForId", query = "SELECT n FROM Member n WHERE n.id = :id"),
+                @NamedQuery(name = "Members.getPending", query = "SELECT n FROM Member n WHERE n.pending = TRUE")
         })
 
 public class Member {
@@ -56,6 +54,9 @@ public class Member {
 
     @Column(name = "status")
     private Boolean status;
+
+    @Column(name = "pending")
+    private Boolean pending;
 
     public Long getId() {
         return id;
@@ -134,5 +135,11 @@ public class Member {
     }
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+    public Boolean getPending() {
+        return pending;
+    }
+    public void setPending(Boolean pending) {
+        this.pending = pending;
     }
 }

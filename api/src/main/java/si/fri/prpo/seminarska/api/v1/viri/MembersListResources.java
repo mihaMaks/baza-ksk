@@ -6,10 +6,10 @@ import si.fri.prpo.seminarska.zrna.MembersListBean;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @ApplicationScoped
 @Path("members")
@@ -69,12 +70,41 @@ public class MembersListResources {
                     .build();
         }
     }
+    @GET
+    @Path("pending")
+    public Response getPendingMembers() {
+        List<Member> pendingMembers = membersListBean.getPendingMembersList();
+
+        if(pendingMembers != null) {
+            if(pendingMembers.isEmpty()){
+                return Response.status(Response.Status.NO_CONTENT).entity("No more pending members.\nGood job!").build();
+            }
+            return Response.ok(pendingMembers).build();
+
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("Pending members list not found").build();
+    }
+
     @POST
     @Transactional
     public Response handleForm(Member member) {
-        // Process the form data (store it, log it, etc.)
+        // Validate the incoming Member object
+        Error memberIsValid = membersListBean.validateMember(member);
 
-        return Response.ok(member).build();  // Return data as-is for demonstration
+        // Call the MembersListBean to persist the member
+        if(memberIsValid.getMessage() == null) {
+            membersListBean.addToPending(member);
+
+            // Return the created member with a success status
+            return Response.status(Response.Status.CREATED)
+                    .entity(member)
+                    .build();
+        }else{
+            return Response.status(Response.Status.NOT_ACCEPTABLE).entity(memberIsValid.getMessage()).build();
+        }
+
+
     }
+
 
 }
