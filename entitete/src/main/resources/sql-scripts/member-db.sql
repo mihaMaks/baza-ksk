@@ -13,4 +13,10 @@ INSERT INTO members (name, surname, dateOfBirth, homeAddress, city, zipCode, ema
 INSERT INTO members (name, surname, dateOfBirth, homeAddress, city, zipCode, email, phoneNumber, status, pending) VALUES ('Evan', 'Taylor', '1995-05-05', '321 Cedar St', 'Ogdenville', '56789', 'evan.taylor@example.com', '+3344556677', FALSE, TRUE);
 INSERT INTO members (name, surname, dateOfBirth, homeAddress, city, zipCode, email, phoneNumber, status, pending) VALUES ('Fiona', 'Davis', '1980-12-25', '654 Birch St', 'North Haverbrook', '43210', 'fiona.davis@example.com', '+7788990011', FALSE, TRUE);
 
+-- Events
+INSERT INTO events (name, place, starts, ends) VALUES ('Tech Conference 2024', 'New York', '2024-12-10 09:00:00', '2024-12-10 18:00:00');
+INSERT INTO events (name, place, starts, ends) VALUES ('Music Festival', 'Los Angeles', '2024-12-15 12:00:00', '2024-12-15 23:59:59');
+INSERT INTO events (name, place, starts, ends) VALUES ('Art Exhibition', 'Paris', '2025-01-20 10:00:00', '2025-01-22 19:00:00');
+INSERT INTO events (name, place, starts, ends) VALUES ('Business Workshop', 'London', '2025-02-10 08:30:00', '2025-02-10 17:00:00');
+INSERT INTO events (name, place, starts, ends) VALUES ('Coding Hackathon', 'Berlin', '2025-03-05 09:00:00', '2025-03-06 20:00:00');
 

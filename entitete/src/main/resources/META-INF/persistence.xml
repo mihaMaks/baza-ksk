@@ -22,6 +22,8 @@
         <jta-data-source>jdbc/NakupovalniSeznamiDS</jta-data-source>
 
         <class>si.fri.prpo.seminarska.entitete.Member</class>
+        <class>si.fri.prpo.seminarska.entitete.CertificateOfEnrollment</class>
+        <class>si.fri.prpo.seminarska.entitete.Event</class>
 
         <class>si.fri.prpo.seminarska.pretvorniki.InstantPretvornik</class>
 

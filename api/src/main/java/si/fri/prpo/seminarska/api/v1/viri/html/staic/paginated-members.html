@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paginated Members</title>
+    <script>
+        let currentPage = 1;
+        const pageSize = 5; // Number of members per page
+
+        async function fetchPaginatedMembers(page) {
+            try {
+                const response = await fetch(`http://localhost:8080/v1/members/paginated?page=${page}&size=${pageSize}`);
+                if (response.status === 204) {
+                    document.getElementById('paginated-members-table').innerHTML = "<tr><td colspan='3'>No members found for this page.</td></tr>";
+                    document.getElementById('pagination-info').innerText = `Page: ${page} (No members available)`;
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                const data = await response.json();
+
+                // Populate the members table
+                const table = document.getElementById('paginated-members-table');
+                table.innerHTML = `<tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                </tr>`;
+                data.members.forEach(member => {
+                    const row = `<tr>
+                        <td>${member.id}</td>
+                        <td>${member.name}</td>
+                        <td>${member.surname}</td>
+                    </tr>`;
+                    table.innerHTML += row;
+                });
+
+                // Update pagination info
+                document.getElementById('pagination-info').innerText = `Page: ${data.page} of ${data.totalPages} | Total Members: ${data.totalCount}`;
+                currentPage = data.page;
+
+                // Enable/Disable buttons based on page
+                document.getElementById('prev-page').disabled = currentPage === 1;
+                document.getElementById('next-page').disabled = currentPage === data.totalPages;
+
+            } catch (error) {
+                console.error('Error fetching paginated members:', error);
+                alert('Failed to fetch paginated members: ' + error.message);
+            }
+        }
+
+        function nextPage() {
+            fetchPaginatedMembers(currentPage + 1);
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                fetchPaginatedMembers(currentPage - 1);
+            }
+        }
+
+        // Fetch the first page on load
+        window.onload = () => fetchPaginatedMembers(currentPage);
+    </script>
+</head>
+<body>
+<h1>Paginated Members</h1>
+<table id="paginated-members-table" border="1">
+    <!-- Table will be dynamically populated -->
+</table>
+<p id="pagination-info">Loading...</p>
+
+<button id="prev-page" onclick="previousPage()">Previous</button>
+<button id="next-page" onclick="nextPage()">Next</button>
+
+<!-- Button to navigate back to the main page -->
+<button onclick="window.location.href='index.html'">Back to Main Page</button>
+</body>
+</html>

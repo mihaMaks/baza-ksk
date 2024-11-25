@@ -1,11 +1,15 @@
 package si.fri.prpo.seminarska.entitete;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import javax.json.bind.annotation.JsonbTransient;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
+import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "members")
@@ -13,7 +17,14 @@ import java.util.Date;
         {
                 @NamedQuery(name = "Members.getAll", query = "SELECT n FROM Member n"),
                 @NamedQuery(name = "Members.getAllForId", query = "SELECT n FROM Member n WHERE n.id = :id"),
-                @NamedQuery(name = "Members.getPending", query = "SELECT n FROM Member n WHERE n.pending = TRUE")
+                @NamedQuery(name = "Members.getPending", query = "SELECT n FROM Member n WHERE n.pending = TRUE"),
+                @NamedQuery(name = "Members.findByNameAndSurname",
+                            query = "SELECT m FROM Member m WHERE m.name LIKE :name " +
+                                    "AND m.surname LIKE :surname AND m.pending = :pending"),
+                @NamedQuery(
+                        name = "Members.getEventsForMember",
+                        query = "SELECT e FROM Event e JOIN e.attendingMembers m WHERE m.id = :memberId"
+                )
         })
 
 public class Member {
@@ -30,7 +41,8 @@ public class Member {
     private String surname;
 
     @Column(name = "dateOfBirth")
-    private Date dateOfBirth;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateOfBirth;
 
     @NotBlank(message = "Home address is required")
     @Column(name = "homeAddress")
@@ -58,6 +70,22 @@ public class Member {
     @Column(name = "pending")
     private Boolean pending;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonbTransient
+    private List<CertificateOfEnrollment> enrollments;
+
+    @ManyToMany(mappedBy = "attendingMembers")
+    @JsonbTransient
+    @JoinColumn(name = "visitedEvents")
+    private List<Event> visitedEvents;
+
+    @Lob
+    @Column(name = "certificate_file")
+    private byte[] certificateFile;  // Stores the image or PDF file
+
+    @Column(name = "file_type")
+    private String fileType; // Stores the file type (e.g., "image/png", "application/pdf")
+
     public Long getId() {
         return id;
     }
@@ -82,11 +110,11 @@ public class Member {
         this.surname = surname;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -141,5 +169,37 @@ public class Member {
     }
     public void setPending(Boolean pending) {
         this.pending = pending;
+    }
+
+    public List<CertificateOfEnrollment> getEnrollments() {
+        return enrollments;
+    }
+
+    public void setEnrollments(List<CertificateOfEnrollment> enrollments) {
+        this.enrollments = enrollments;
+    }
+
+    public List<Event> getVisitedEvents() {
+        return visitedEvents;
+    }
+
+    public void setVisitedEvents(List<Event> visitedEvents) {
+        this.visitedEvents = visitedEvents;
+    }
+
+    public byte[] getCertificateFile() {
+        return certificateFile;
+    }
+
+    public void setCertificateFile(byte[] certificateFile) {
+        this.certificateFile = certificateFile;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 }
