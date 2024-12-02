@@ -20,3 +20,8 @@ INSERT INTO events (name, place, starts, ends) VALUES ('Art Exhibition', 'Paris'
 INSERT INTO events (name, place, starts, ends) VALUES ('Business Workshop', 'London', '2025-02-10 08:30:00', '2025-02-10 17:00:00');
 INSERT INTO events (name, place, starts, ends) VALUES ('Coding Hackathon', 'Berlin', '2025-03-05 09:00:00', '2025-03-06 20:00:00');
 
+-- Associate Members with Events in the Join Table
+INSERT INTO event_member (event_id, member_id) VALUES (1, 1); -- John attends Tech Conference
+INSERT INTO event_member (event_id, member_id) VALUES (2, 1); -- John attends Music Festival
+INSERT INTO event_member (event_id, member_id) VALUES (3, 2); -- Jane attends Art Exhibition
+INSERT INTO event_member (event_id, member_id) VALUES (1, 2); -- Jane also attends Tech Conference

@@ -1,4 +1,4 @@
-# Nakupovalni seznami 
+# KŠK BAZA
 
 Skeletni projekt za predmet PRPO.
 

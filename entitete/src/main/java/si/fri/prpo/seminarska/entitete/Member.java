@@ -52,7 +52,7 @@ public class Member {
     @Column(name = "city")
     private String city;
 
-    @Pattern(regexp = "\\d{5}", message = "ZIP code must be 5 digits")
+    @Pattern(regexp = "\\d{4}", message = "ZIP code must be 4 digits")
     @Column(name = "zipCode")
     private String zipCode;
 
@@ -60,7 +60,7 @@ public class Member {
     @Column(name = "email")
     private String email;
 
-    @Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number is invalid")
+    @Pattern(regexp = "\\+?[0-9]{9,15}", message = "Phone number is invalid")
     @Column(name = "phoneNumber")
     private String phoneNumber;
 
@@ -134,11 +134,11 @@ public class Member {
         this.city = city;
     }
 
-    public @Pattern(regexp = "\\d{5}", message = "ZIP code must be 5 digits") String getZipCode() {
+    public @Pattern(regexp = "\\d{4}", message = "ZIP code must be 4 digits") String getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(@Pattern(regexp = "\\d{5}", message = "ZIP code must be 5 digits") String zipCode) {
+    public void setZipCode(@Pattern(regexp = "\\d{4}", message = "ZIP code must be 4 digits") String zipCode) {
         this.zipCode = zipCode;
     }
 
@@ -150,11 +150,11 @@ public class Member {
         this.email = email;
     }
 
-    public @Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number is invalid") String getPhoneNumber() {
+    public @Pattern(regexp = "\\+?[0-9]{9,15}", message = "Phone number is invalid") String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(@Pattern(regexp = "\\+?[0-9]{10,15}", message = "Phone number is invalid") String phoneNumber) {
+    public void setPhoneNumber(@Pattern(regexp = "\\+?[0-9]{9,15}", message = "Phone number is invalid") String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

@@ -29,12 +29,14 @@ public class EntryFormResource {
     EntryFormBean entryFormBean;
 
     @POST
-    @Path("plus-file")
+    @Path("")
     @Transactional
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response handleForm(@FormDataParam("member") String memberJson, @FormDataParam("file") InputStream fileInputStream,
                                @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+        System.out.println(memberJson);
+        System.out.println(fileInputStream);
         // Create an ObjectMapper with JavaTimeModule registered
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
