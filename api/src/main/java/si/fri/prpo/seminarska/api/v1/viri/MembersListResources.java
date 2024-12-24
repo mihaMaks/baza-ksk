@@ -78,6 +78,74 @@ public class MembersListResources {
     }
 
     @GET
+    @Path("/pending/paginated")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPendingPaginatedMembersWithMetadata(@QueryParam("page") int page, @QueryParam("size") int size,
+                                                           @QueryParam("name") String name,
+                                                           @QueryParam("surname") String surname,
+                                                           @QueryParam("email") String email,
+                                                           @QueryParam("pending") String pending) {
+        if (page < 1 || size < 1) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Page and size parameters must be greater than 0.")
+                    .build();
+        }
+
+        int offset = (page - 1) * size; // Calculate the offset
+        // Base SQL query
+        // Start the JPQL query
+        // Initialize the JPQL query with a basic SELECT statement
+        StringBuilder jpqlQuery = new StringBuilder("SELECT m FROM Member m WHERE 1=1");
+        StringBuilder jpqlQueryCount = new StringBuilder("SELECT COUNT(m) FROM Member m WHERE 1=1");
+        // Use default values for parameters if they are null or empty
+        name = (name != null && !name.isEmpty()) ? "%" + name.toLowerCase() + "%" : "%"; // Default is '%' for all names
+        surname = (surname != null && !surname.isEmpty()) ? "%" + surname.toLowerCase() + "%" : "%"; // Default is '%' for all surnames
+        email = (email != null && !email.isEmpty()) ? "%" + email.toLowerCase() + "%" : "%"; // Default is '%' for all emails
+        pending = (pending != null && !pending.isEmpty()) ? pending : null; // Default is null for pending
+
+        // Add filters dynamically without using 'if' statements
+        jpqlQuery.append(" AND LOWER(m.name) LIKE :name");
+        jpqlQuery.append(" AND LOWER(m.surname) LIKE :surname");
+        jpqlQuery.append(" AND LOWER(m.email) LIKE :email");
+
+        jpqlQueryCount.append(" AND LOWER(m.name) LIKE :name");
+        jpqlQueryCount.append(" AND LOWER(m.surname) LIKE :surname");
+        jpqlQueryCount.append(" AND LOWER(m.email) LIKE :email");
+
+        if (pending != null) {
+            jpqlQuery.append(" AND m.pending = :pending");
+            jpqlQueryCount.append(" AND m.pending = :pending");
+        }
+
+        // Add pagination to the query
+        jpqlQuery.append(" ORDER BY m.surname");
+
+
+        // Execute the native SQL query
+        List<Member> members = membersListBean.getPendingPaginatedMembersList(jpqlQuery.toString(), name, surname, email, pending, size, offset);
+
+
+        if (members.isEmpty()) {
+            return Response.status(Response.Status.NO_CONTENT).entity("No members found for the given page.").build();
+        }
+
+        // Fetch total member count
+        long totalCount = membersListBean.getTotalMemberFilterCount(jpqlQueryCount.toString(), name, surname, email, pending);
+
+        // Calculate total pages
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+        try {
+            // Build the response with metadata
+            PaginatedResponse response = new PaginatedResponse(members, page, size, totalCount, totalPages);
+            return Response.ok()
+                    .entity(response)
+                    .build();
+        }catch (Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
     @Path("{memberId}")
     public Response getMember(@PathParam("memberId") long memberId) {
         try {
@@ -279,14 +347,14 @@ public class MembersListResources {
     }
 
     @POST
-    @Path("{memberId}/certificates")
+    @Path("{memberId}/enrollments")
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addCertificateToMember(@PathParam("memberId") long memberId, CertificateOfEnrollment certificate) {
+    public Response addCertificateToMember(@PathParam("memberId") long memberId, CertificateOfEnrollment enrollment) {
+        //System.out.println("addCertificateToMember reached!");
         try {
             // Fetch the member by ID
             Member member = membersListBean.getMemberById(memberId);
-
             if (member == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("Member not found for ID: " + memberId)
@@ -294,10 +362,10 @@ public class MembersListResources {
             }
 
             // Persist the changes
-            member = membersListBean.addCertificateOfEnrollment(member, certificate);
+            member = membersListBean.addCertificateOfEnrollment(member, enrollment);
             if (member != null) {
                 return Response.status(Response.Status.CREATED)
-                        .entity("Certificate successfully added to member with ID: " + memberId)
+                        .entity(member)
                         .build();
             }
             return Response.status(Response.Status.BAD_REQUEST).entity("addCertificateOfEnrollment failed").build();
@@ -311,7 +379,7 @@ public class MembersListResources {
     }
 
     @GET
-    @Path("{memberId}/certificates")
+    @Path("{memberId}/enrollments")
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getCertificateForMember(@PathParam("memberId") long memberId) {
@@ -392,6 +460,22 @@ public class MembersListResources {
                     .entity(e.getMessage())
                     .build();
         }
+    }
+
+    @GET
+    @Path("/{id}/file")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response getMemberFile(@PathParam("id") Long id) {
+        Member member = membersListBean.getMemberById(id);
+        if (member == null || member.getCertificateFile() == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("File not found for the given member ID").build();
+        }
+
+        return Response.ok(member.getCertificateFile())
+                .header("Content-Disposition", "attachment; filename=member-file." + member.getFileType().split("/")[1])
+                .type(member.getFileType())
+                .build();
     }
 
 }

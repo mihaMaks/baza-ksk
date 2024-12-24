@@ -1,6 +1,9 @@
 package si.fri.prpo.seminarska.entitete;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 @Entity
 @Table(name = "certificate")
@@ -18,10 +21,12 @@ public class CertificateOfEnrollment {
     private String university;
 
     @Column(name = "validFrom")
-    private Date validFrom;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate validFrom;
 
     @Column(name = "valitTo")
-    private Date validTo;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate validTo;
 
     @Column(name = "pupilOrStudent")
     private String pupilOrStudent;
@@ -54,19 +59,19 @@ public class CertificateOfEnrollment {
         this.university = university;
     }
 
-    public Date getValidFrom() {
+    public LocalDate getValidFrom() {
         return validFrom;
     }
 
-    public void setValidFrom(Date validFrom) {
+    public void setValidFrom(LocalDate validFrom) {
         this.validFrom = validFrom;
     }
 
-    public Date getValidTo() {
+    public LocalDate getValidTo() {
         return validTo;
     }
 
-    public void setValidTo(Date validTo) {
+    public void setValidTo(LocalDate validTo) {
         this.validTo = validTo;
     }
 
@@ -86,7 +91,7 @@ public class CertificateOfEnrollment {
         sb.append("\tvalidFrom=").append(validFrom).append("\n");
         sb.append("\tvalidTo=").append(validTo).append("\n");
         sb.append("\tpupilOrStudent=").append(pupilOrStudent).append("\n");
-        sb.append("\tmember=").append(member.getId().toString()).append("\n");
+        //sb.append("\tmember=").append(member.getId().toString()).append("\n");
         sb.append("\t}\n");
         return sb.toString();
     }

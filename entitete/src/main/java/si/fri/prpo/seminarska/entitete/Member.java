@@ -202,4 +202,15 @@ public class Member {
     public void setFileType(String fileType) {
         this.fileType = fileType;
     }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Member{\n");
+        sb.append("\tmember id: ").append(id).append("\n");
+        sb.append("\tname: ").append(name).append("\n");
+        sb.append("\tsurname: ").append(surname).append("\n");
+        sb.append("\tzip code: ").append(zipCode).append("\n");
+        //sb.append("\tmember=").append(member.getId().toString()).append("\n");
+        sb.append("\t}\n");
+        return sb.toString();
+    }
 }
